@@ -1,31 +1,29 @@
 package MitaSong.Controller;
 
+import MitaSong.Pojo.Artist;
+import MitaSong.Pojo.Genre;
 import MitaSong.Pojo.Song;
+import MitaSong.Pojo.Stats;
 import MitaSong.Services.SongService;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
-@AllArgsConstructor
 @RestController
 @RequestMapping("/songs")
 @CrossOrigin(origins = "")
 public class SongController {
 
-    @Autowired
-    private SongService songService;
+    private final SongService songService;
 
-    @ApiIgnore
-    @RequestMapping()
-    public void redirect(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/swagger-ui.html");
+    @Autowired
+    public SongController(SongService songService) {
+        this.songService = songService;
     }
 
     @GetMapping(produces = "application/json")
@@ -36,9 +34,9 @@ public class SongController {
 
     @GetMapping(value = "/{songId}", produces = "application/json")
     public ResponseEntity<Song> getSongById(@PathVariable String songId) {
-        Song song = songService.getSongById(songId);
-        if (song != null) {
-            return new ResponseEntity<>(song, HttpStatus.OK);
+        Optional<Song> songOptional = songService.getSongById(songId);
+        if (songOptional.isPresent()) {
+            return new ResponseEntity<>(songOptional.get(), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -62,8 +60,103 @@ public class SongController {
     }
 
     @DeleteMapping(value = "/{songId}", produces = "application/json")
-    public ResponseEntity<Song> deleteSongById(@PathVariable String songId) {
+    public ResponseEntity<Void> deleteSongById(@PathVariable String songId) {
         boolean deleted = songService.deleteSong(songId);
+        if (deleted) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    @PostMapping(value="/genre",produces = "application/json")
+    public ResponseEntity<Genre> addGenre(@RequestBody Genre song) {
+        Genre createdSong = songService.createGenre(song);
+            return new ResponseEntity<>(createdSong, HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = "/{songId}/artist", produces = "application/json")
+    public ResponseEntity<Artist> getArtistBySongId(@PathVariable String songId) {
+        Optional<Artist> artistOptional = songService.getArtistBySongId(songId);
+        if (artistOptional.isPresent()) {
+            return new ResponseEntity<>(artistOptional.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping(value = "/{songId}/artist", produces = "application/json")
+    public ResponseEntity<Artist> updateArtistBySongId(
+            @PathVariable String songId,
+            @RequestBody Artist updatedArtist
+    ) {
+        Artist artist = songService.updateArtistBySongId(songId, updatedArtist);
+        if (artist != null) {
+            return new ResponseEntity<>(artist, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(value = "/{songId}/genre", produces = "application/json")
+    public ResponseEntity<Genre> getGenreBySongId(@PathVariable String songId) {
+        Optional<Genre> genreOptional = songService.getGenreBySongId(songId);
+        if (genreOptional.isPresent()) {
+            return new ResponseEntity<>(genreOptional.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping(value = "/{songId}/genre", produces = "application/json")
+    public ResponseEntity<Genre> updateGenreBySongId(
+            @PathVariable String songId,
+            @RequestBody Genre updatedGenre
+    ) {
+        Genre genre = songService.updateGenreBySongId(songId, updatedGenre);
+        if (genre != null) {
+            return new ResponseEntity<>(genre, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(value = "/{songId}/stats", produces = "application/json")
+    public ResponseEntity<Stats> getStatsBySongId(@PathVariable String songId) {
+        Optional<Stats> statsOptional = songService.getStatsBySongId(songId);
+        if (statsOptional.isPresent()) {
+            return new ResponseEntity<>(statsOptional.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping(value = "/{songId}/stats", produces = "application/json")
+    public ResponseEntity<Stats> updateStatsBySongId(
+            @PathVariable String songId,
+            @RequestBody Stats updatedStats
+    ) {
+        Stats stats = songService.updateStatsBySongId(songId, updatedStats);
+        if (stats != null) {
+            return new ResponseEntity<>(stats, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping(value = "/{songId}/artist", produces = "application/json")
+    public ResponseEntity<Void> deleteArtistBySongId(@PathVariable String songId) {
+        boolean deleted = songService.deleteArtistBySongId(songId);
+        if (deleted) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping(value = "/{songId}/genre", produces = "application/json")
+    public ResponseEntity<Void> deleteGenreBySongId(@PathVariable String songId) {
+        boolean deleted = songService.deleteGenreBySongId(songId);
+        if (deleted) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping(value = "/{songId}/stats", produces = "application/json")
+    public ResponseEntity<Void> deleteStatsBySongId(@PathVariable String songId) {
+        boolean deleted = songService.deleteStatsBySongId(songId);
         if (deleted) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }

@@ -8,13 +8,4 @@ import java.util.List;
 
 @Repository
 public interface SongRepo extends MongoRepository<Song,String> {
-    Song getSongById(String songId);
-
-    boolean deleteSong(String songId);
-
-    Song updateSong(Song song);
-
-    Song saveSong(Song song);
-
-    List<Song> getAllSongs();
 }
